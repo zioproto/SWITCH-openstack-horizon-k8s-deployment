@@ -1,0 +1,27 @@
+# Before creating this deployment create the TLS secrets:
+# kubectl create secret tls horizonsecret --key tls.key.pem --cert tls.crt.pem
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: horizon-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/app-root: /horizon
+spec:
+  tls:
+    - hosts:
+      - engines.scloud.switch.ch
+      # This assumes tls-secret exists and the SSL
+      # certificate contains a CN for foo.bar.com
+      secretName: horizonsecret
+  rules:
+    - host: engines.scloud.switch.ch
+      http:
+        paths:
+        - path: /
+          backend:
+            # This assumes http-svc exists and routes to healthy endpoints
+            serviceName: horizon-svc
+            servicePort: 8080
+

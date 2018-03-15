@@ -1,0 +1,44 @@
+# Before using this you need to create the PullSecrets
+# kubectl create secret docker-registry gitlabswitch --docker-server=cr.gitlab.switch.ch --docker-username=proto --docker-password=mysecretpassword --docker-email=saverio.proto@switch.ch
+
+# Before using this deployment you need to generate teh Horizon SECRET_KEY
+# kubectl create secret generic horizonsecretkey --from-file=.secret_key_store=<(openssl rand -base64 64)
+
+---
+apiVersion: apps/v1beta2 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: horizon-deployment
+  labels:
+    app: horizon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: horizon
+  template:
+    metadata:
+      labels:
+        app: horizon
+    spec:
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: horizonsecretkey
+          defaultMode: 384
+      containers:
+      - name: horizon
+        image: zioproto/switchengines-horizon:latest
+        #image: cr.gitlab.switch.ch/proto/docker-horizon:latest
+        imagePullPolicy: Always
+        env:
+          - name: OPENSTACK_KEYSTONE_URL
+            value: "https://keystone.scloud.switch.ch:5000/v3"
+        ports:
+        - containerPort: 8080
+          name: apache
+        volumeMounts:
+        - mountPath: /etc/openstack-dashboard/secretreadonly
+          name: secret-volume
+      imagePullSecrets:
+        - name: gitlabswitch

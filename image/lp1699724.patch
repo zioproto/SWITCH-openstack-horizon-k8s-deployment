@@ -1,0 +1,33 @@
+commit 3929a8b7cd893f0b4c0ff6c20d5d1fd9077b4dd2
+Author: Simon Collins <simoncollins99@gmail.com>
+Date:   Wed Jan 17 12:11:15 2018 +1300
+
+    Security group quota error handling
+
+    When adding a new rule to a secruity group that would exceed the
+    quota, the error message displays a quota error, rather than rule
+    already exists error. It does this my first checking for an
+    "OverQuotaClient" error, then if that except doesn't trigger it
+    checks for any other conflict
+
+    Change-Id: I8eaa0f00b25c8c3b75fef2bf46979f1f248c6896
+    Closes-Bug: #1699724
+
+diff --git a/openstack_dashboard/api/neutron.py b/openstack_dashboard/api/neutron.py
+index ba007996b..3bff588dd 100644
+--- a/openstack_dashboard/api/neutron.py
++++ b/openstack_dashboard/api/neutron.py
+@@ -419,8 +419,12 @@ class SecurityGroupManager(object):
+                  'remote_group_id': group_id}}
+         try:
+             rule = self.client.create_security_group_rule(body)
++        except neutron_exc.OverQuotaClient:
++            raise exceptions.Conflict(
++                _('Security group rule quota exceeded.'))
+         except neutron_exc.Conflict:
+-            raise exceptions.Conflict(_('Security group rule already exists.'))
++            raise exceptions.Conflict(
++                _('Security group rule already exists.'))
+         rule = rule.get('security_group_rule')
+         sg_dict = self._sg_name_dict(parent_group_id, [rule])
+         return SecurityGroupRule(rule, sg_dict)
