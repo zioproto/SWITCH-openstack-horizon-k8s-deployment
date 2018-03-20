@@ -21,11 +21,15 @@ spec:
       labels:
         app: horizon
     spec:
+      securityContext:
+        fsGroup: 110
       volumes:
       - name: secret-volume
         secret:
           secretName: horizonsecretkey
           defaultMode: 384
+      - name: varloghorizon
+        emptyDir: {}
       containers:
       - name: horizon
         image: zioproto/switchengines-horizon:latest
@@ -38,7 +42,15 @@ spec:
         - containerPort: 8080
           name: apache
         volumeMounts:
-        - mountPath: /etc/openstack-dashboard/secretreadonly
-          name: secret-volume
+        - name: secret-volume
+          mountPath: /etc/openstack-dashboard/secretreadonly
+        - name: varloghorizon
+          mountPath: /var/log/horizon/
+      - name: horizonlog
+        image: busybox
+        args: [/bin/sh, -c, 'touch /var/log/horizon/horizon.log && chmod g+w /var/log/horizon/horizon.log && tail -n+1 -f /var/log/horizon/horizon.log']
+        volumeMounts:
+        - name: varloghorizon
+          mountPath: /var/log/horizon/
       imagePullSecrets:
         - name: gitlabswitch
