@@ -8,6 +8,7 @@ metadata:
   name: horizon-ingress
   annotations:
     nginx.ingress.kubernetes.io/app-root: /horizon
+    nginx.ingress.kubernetes.io/proxy-body-size: 30g
 spec:
   tls:
     - hosts:

@@ -8,6 +8,8 @@ sed -i "s/%REDIS_MASTER_SERVICE_HOST%/${REDIS_MASTER_SERVICE_HOST}/" /etc/openst
 
 sed -i "s!%OPENSTACK_KEYSTONE_URL%!${OPENSTACK_KEYSTONE_URL}!" /etc/openstack-dashboard/local_settings.py
 
+mkdir -p /var/lib/horizon/upload/
+chmod 777 -Rv /var/lib/horizon/
 mkdir /etc/openstack-dashboard/secret/
 cp /etc/openstack-dashboard/secretreadonly/.secret_key_store /etc/openstack-dashboard/secret/.secret_key_store
 /bin/chown horizon /etc/openstack-dashboard/secret/.secret_key_store
