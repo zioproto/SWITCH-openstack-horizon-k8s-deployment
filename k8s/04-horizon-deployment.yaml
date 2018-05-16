@@ -35,6 +35,10 @@ spec:
         image: zioproto/switchengines-horizon:latest
         #image: cr.gitlab.switch.ch/proto/docker-horizon:latest
         imagePullPolicy: Always
+        readinessProbe:
+          httpGet:
+            path: /horizon/auth/login
+            port: 8080
         livenessProbe:
           failureThreshold: 3
           httpGet:
