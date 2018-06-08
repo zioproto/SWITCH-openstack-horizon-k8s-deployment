@@ -1,0 +1,79 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: horizon-deployment
+  namespace: "{{ namespace | default('horizontesting123', true) }}"
+  labels:
+    app: horizon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: horizon
+  template:
+    metadata:
+      labels:
+        app: horizon
+    spec:
+      securityContext:
+        fsGroup: 110
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: horizonsecretkey
+          defaultMode: 384
+      - name: varloghorizon
+        emptyDir: {}
+      - name: apachelogs
+        emptyDir: {}
+      containers:
+      - name: horizon
+        image: " {{ horizondockerimage | default('zioproto/switchengines-horizon:latest', true) }}"
+        imagePullPolicy: Always
+        readinessProbe:
+          httpGet:
+            path: /horizon/auth/login
+            port: 8080
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /horizon/auth/login
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 1
+        envFrom:
+          - configMapRef:
+              name: horizon-config
+        resources:
+          limits:
+            memory: 2Gi
+        ports:
+        - containerPort: 8080
+          name: apache
+        volumeMounts:
+        - name: secret-volume
+          mountPath: /etc/openstack-dashboard/secretreadonly
+        - name: varloghorizon
+          mountPath: /var/log/horizon/
+        - name: apachelogs
+          mountPath: /var/log/apache2/
+      - name: horizonlog
+        image: busybox
+        args: [/bin/sh, -c, 'touch /var/log/horizon/horizon.log && chmod g+w /var/log/horizon/horizon.log && tail -n+1 -f /var/log/horizon/horizon.log']
+        volumeMounts:
+        - name: varloghorizon
+          mountPath: /var/log/horizon/
+      - name: errorlog
+        image: busybox
+        args: [/bin/sh, -c, 'touch /var/log/apache2/error.log && chmod g+w /var/log/apache2/error.log && tail -n+1 -f /var/log/apache2/error.log']
+        volumeMounts:
+        - name: apachelogs
+          mountPath: /var/log/apache2/
+{% if dockerpullsecret is defined %}
+      imagePullSecrets:
+        - name: gitlabswitch
+{% endif %}
+

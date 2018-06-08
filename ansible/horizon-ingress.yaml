@@ -1,0 +1,28 @@
+apiVersion: v1beta1
+kind: Ingress
+metadata:
+  name: horizon-ingress
+  namespace: "{{ namespace | default('horizontesting123', true) }}"
+  annotations:
+    nginx.ingress.kubernetes.io/app-root: /horizon
+    nginx.ingress.kubernetes.io/proxy-body-size: 30g
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    kubernetes.io/ingress.class: "nginx-public"
+spec:
+  tls:
+    - hosts:
+      - "{{ hostname }}"
+      # This assumes tls-secret exists and the SSL
+      # certificate contains a CN for foo.bar.com
+      secretName: horizonsecret
+  rules:
+    - host: "{{ hostname }}"
+      http:
+        paths:
+        - path: /
+          backend:
+            # This assumes http-svc exists and routes to healthy endpoints
+            serviceName: horizon-svc
+            servicePort: 8080

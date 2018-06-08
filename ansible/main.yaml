@@ -1,0 +1,60 @@
+# This playbook requires at least ansible version 2.6.0rc1
+# sudo pip install ansible==2.6.0rc1
+---
+- name: K8s
+  hosts: localhost
+  vars_files:
+    - vars.yaml
+  tasks:
+  - name: Create namespace
+    k8s:
+      name: "{{ namespace | default('horizontesting123', true) }}"
+      api_version: v1
+      kind: Namespace
+      state: present
+
+  - name: Create tls secret
+    k8s:
+      state: present
+      definition: "{{ lookup('template', 'tls-secret.yaml') | from_yaml }}"
+
+  - name: Create Horizon Session Secret
+    k8s:
+      state: present
+      definition: "{{ lookup('template', 'horizon-session-secret.yaml') | from_yaml }}"
+
+  - name: Create pull secret
+    k8s:
+      state: present
+      definition: "{{ lookup('template', 'docker-pull-secret.yaml') | from_yaml }}"
+    when: dockerpullsecret is defined
+
+  - name: Create configmap
+    k8s:
+      state: present
+      definition: "{{ lookup('template', 'configmap.yaml') | from_yaml }}"
+
+  - name: redis-master service
+    k8s:
+      state: present
+      definition: "{{ lookup('template', 'redis-master-svc.yaml') | from_yaml }}"
+
+  - name: horizon service
+    k8s:
+      state: present
+      definition: "{{ lookup('template', 'horizon-svc.yaml') | from_yaml }}"
+
+  - name: redis-master deployment
+    k8s:
+      state: present
+      definition: "{{ lookup('template', 'redis-deployment.yaml') | from_yaml }}"
+
+  - name: horizon deployment
+    k8s:
+      state: present
+      definition: "{{ lookup('template', 'horizon-deployment.yaml') | from_yaml }}"
+
+  - name: horizon ingress
+    k8s:
+      state: present
+      definition: "{{ lookup('template', 'horizon-ingress.yaml') | from_yaml }}"

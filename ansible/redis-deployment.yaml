@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis-master
+  namespace: "{{ namespace | default('horizontesting123', true) }}"
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: master
+        image: zioproto/redis
+        imagePullPolicy: Always
+        env:
+          - name: MASTER
+            value: "true"
+        ports:
+          - containerPort: 6379
+        resources:
+          limits:
+            cpu: "0.9"

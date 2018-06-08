@@ -1,0 +1,21 @@
+namespace: testing123
+hostname: engines.scloud.switch.ch
+keystoneurl: https://keystone.scloud.switch.ch:5000/v3
+#horizondockerimage:
+
+# openssl rand -base64 64 | tr -d '\n' | ansible-vault encrypt_string --stdin-name 'horizonsessionsecret'
+horizonsessionsecret:
+
+#If you need to add a Docker pull secrete:
+#echo -n base64string.dockerconfigjson | ansible-vault encrypt_string --stdin-name 'dockerpullsecret'
+#dockerpullsecret:
+
+#TLS certificate base64 encoded.
+#To see this data do 'cat tls.crt | base64 -D'
+# cat cert.pem | base64
+tlscrt:
+
+# cat file.key | base64 | ansible-vault encrypt_string --stdin-name 'tlskey'
+# cat file.key | base64 | tr -d '\n' | ansible-vault encrypt_string --stdin-name 'tlskey'
+tlskey:
+

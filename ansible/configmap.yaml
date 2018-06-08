@@ -1,0 +1,7 @@
+kind: ConfigMap
+apiVersion: v1
+data:
+  OPENSTACK_KEYSTONE_URL: "{{ keystoneurl | default('https://keystone.scloud.switch.ch:5000/v3',true)}}"
+metadata:
+  name: horizon-config
+  namespace: "{{ namespace | default('horizontesting123', true) }}"
