@@ -28,7 +28,7 @@ spec:
         emptyDir: {}
       containers:
       - name: horizon
-        image: " {{ horizondockerimage | default('zioproto/switchengines-horizon:latest', true) }}"
+        image: "{{ horizondockerimage | default('zioproto/switchengines-horizon:latest', true) }}"
         imagePullPolicy: Always
         readinessProbe:
           httpGet:
