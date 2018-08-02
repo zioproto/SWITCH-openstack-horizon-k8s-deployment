@@ -11,16 +11,6 @@ RUN set -x \
     && apt-get -y clean \
     && pip install -r /requirements.txt \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-COPY lp1744239.patch /lp1744239.patch
-COPY lp1699724.patch /lp1699724.patch
-WORKDIR /usr/share/openstack-dashboard
-RUN patch -p1 < /lp1744239.patch
-RUN rm openstack_dashboard/utils/settings.pyc
-RUN python -m py_compile openstack_dashboard/utils/settings.py
-WORKDIR /usr/share/openstack-dashboard
-RUN patch -p1 < /lp1699724.patch
-RUN rm openstack_dashboard/api/neutron.pyc
-RUN python -m py_compile openstack_dashboard/api/neutron.py
 WORKDIR /root
 COPY img/logo.svg /var/lib/openstack-dashboard/static/dashboard/img/logo.svg
 COPY img/logo-splash.svg /var/lib/openstack-dashboard/static/dashboard/img/logo-splash.svg
