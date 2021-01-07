@@ -44,7 +44,7 @@ keyring==7.3
 keystoneauth1==3.1.0
 kombu==4.0.2
 linecache2==1.0.0
-lxml==3.5.0
+lxml==4.6.2
 MarkupSafe==0.23
 mock==2.0.0
 monotonic==0.6
