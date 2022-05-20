@@ -2,7 +2,7 @@
 # kubectl create secret tls horizonsecret --key tls.key.pem --cert tls.crt.pem
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: horizon-ingress
@@ -21,8 +21,10 @@ spec:
       http:
         paths:
         - path: /
+          pathType: Prefix
           backend:
-            # This assumes http-svc exists and routes to healthy endpoints
-            serviceName: horizon-svc
-            servicePort: 8080
+            service:
+              name: horizon-svc
+              port:
+                number: 8080
 
