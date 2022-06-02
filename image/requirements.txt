@@ -32,7 +32,7 @@ futures==3.0.5
 futurist==0.13.0
 greenlet==0.4.9
 horizon==12.0.1
-html5lib==0.999
+html5lib==0.99999999
 idna==2.5
 ipaddress==1.0.16
 iso8601==0.1.11
